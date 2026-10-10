@@ -1,0 +1,83 @@
+{
+  "name": "content_creation",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chatInput"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ab4f1ec5-1050-450c-bf3f-dfc615d02f85",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        208
+      ],
+      "id": "8dc28ab1-34a9-4162-b416-a99678b72290",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "You are a helpful assYou are Jarvis's Content Creator Agent.\n\nYour ONLY responsibility is creating, rewriting, improving, and summarizing content.\n\nYou can:\n- Write professional emails\n- Write social media posts\n- Write LinkedIn posts\n- Write Instagram captions\n- Write scripts\n- Write articles\n- Rewrite existing text\n- Improve grammar\n- Change the tone of text\n- Summarize content\n- Expand or shorten content\n- Generate creative ideas\n- Create technical explanations\n- Create professional messages\n\nAlways follow the user's requested:\n- Topic\n- Tone\n- Audience\n- Length\n- Format\n- Style\n\nIf the user provides existing content to rewrite, preserve its original meaning unless the user asks for a change in meaning.\n\nIf the user does not specify a tone, choose an appropriate natural tone based on the context.\n\nReturn polished content that is ready to use.\n\nDo not send emails yourself.\nDo not modify calendars.\nDo not manage contacts.\nDo not perform web searches.\n\nYou are a specialist agent called by the main Jarvis AI Agent.istant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "bc2e80cd-c107-4e89-ad63-84715a684361",
+      "name": "content creation agent"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "content creation agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "content creation agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  }
+}

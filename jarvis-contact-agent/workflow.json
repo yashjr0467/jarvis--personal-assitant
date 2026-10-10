@@ -1,0 +1,161 @@
+{
+  "name": "contact agent",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chatInput"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b711005e-225b-4e4a-95d5-f506d43a3984",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are Jarvis's Contact Agent.\n\nYour ONLY responsibility is managing the user's contacts.\n\nYou can:\n- Search contacts\n- Find a contact\n- Retrieve contact information\n- Create contacts\n- Update contacts\n- Delete contacts\n\nAlways understand the user's request before performing an action.\n\nNever invent contact information.\n\nWhen searching for a person, use the available Google Contacts tools rather than guessing.\n\nFor creating a contact, identify:\n- First name\n- Last name\n- Phone number\n- Email address\n- Organization\n- Other information provided by the user\n\nOnly use information provided by the user or returned by a contact lookup.\n\nIf important information is missing when creating or updating a contact, ask the user for it.\n\nAfter successfully creating, updating, or deleting a contact, provide a concise confirmation.\n\nYou are a specialist agent called by the main Jarvis AI Agent.\n\nDo not manage emails, calendars, web searches, or unrelated tasks."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "8112cd83-a7de-4949-bb0d-aa9770b4336e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        208
+      ],
+      "id": "bc1c4d77-e870-4d05-86a0-5b39ef0854c6",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Search and retrieve contacts from the user's Google Contacts. Use this tool when the user wants to find a person or retrieve contact information.",
+        "operation": "getAll",
+        "fields": [
+          "names",
+          "phoneNumbers",
+          "emailAddresses",
+          "organizations"
+        ],
+        "useQuery": true,
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', `The name, email address, phone number, or other identifying information the user wants to search for in Google Contacts. Use the user's request to create an appropriate contact search query.\n`, 'string') }}"
+      },
+      "type": "n8n-nodes-base.googleContactsTool",
+      "typeVersion": 1,
+      "position": [
+        304,
+        208
+      ],
+      "id": "1fb42156-b8fd-4dda-b98a-24c003674797",
+      "name": "Get many contacts in Google Contacts"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create a new contact in the user's Google Contacts. Use this tool when the user asks Jarvis to save or create a new contact.",
+        "familyName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Family_Name', `The contact's family name or last name, if provided by the user. Leave empty if the user does not provide one.`, 'string') }}",
+        "givenName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Given_Name', `The contact's given name or first name, if provided by the user.`, 'string') }}",
+        "additionalFields": {
+          "emailsUi": {
+            "emailsValues": [
+              {
+                "type": "work",
+                "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('emailsValues0_Value', `The email address for the contact, exactly as provided by the user.`, 'string') }}"
+              }
+            ]
+          },
+          "group": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Group_Names_or_IDs', ``, 'string') }}",
+          "phoneUi": {
+            "phoneValues": [
+              {
+                "type": "mobile",
+                "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('phoneValues0_Value', `The phone number for the contact, exactly as provided by the user.`, 'string') }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleContactsTool",
+      "typeVersion": 1,
+      "position": [
+        480,
+        208.5
+      ],
+      "id": "607624ab-eb03-4009-8aab-b9de54cecb13",
+      "name": "Create a contact in Google Contacts"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many contacts in Google Contacts": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a contact in Google Contacts": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  }
+}

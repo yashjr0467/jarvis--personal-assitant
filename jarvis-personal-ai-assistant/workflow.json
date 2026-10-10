@@ -1,0 +1,372 @@
+{
+  "name": "yash_AI_main",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "jarvis",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -240,
+        16
+      ],
+      "id": "9dbd4fb9-6e8b-4ae2-867f-c79a4858ed69",
+      "name": "Webhook"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -352,
+        224
+      ],
+      "id": "31ea4198-151c-4f33-bb3f-d0643981d076",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=yash\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -208,
+        224
+      ],
+      "id": "73c3440e-1d51-499b-b31a-8b197c77df43",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.chatInput }}\n",
+        "options": {
+          "systemMessage": "You are YASH_ai, the central AI assistant and coordinator.\n\nYour job is to understand the user's request and use the appropriate\nspecialist tool when necessary.\n\nAVAILABLE SPECIALIST TOOLS:\n\n1. calendar_agent\nUse this for:\n- Checking calendar events\n- Creating events\n- Updating or rescheduling events\n- Deleting events\n- Checking schedules\n- Appointments and meetings\n\n2. email_agent\nUse this for:\n- Searching emails\n- Reading emails\n- Summarizing emails\n- Sending emails\n- Replying to emails\n- Managing Gmail\n\n3. content_creator\nUse this for:\n- Writing content\n- Rewriting content\n- Improving grammar\n- LinkedIn posts\n- Instagram captions\n- Scripts\n- Articles\n- Professional messages\n- Summaries\n- Other writing tasks\n\n4. contact_agent\nUse this for:\n- Finding contacts\n- Retrieving contact information\n- Creating contacts\n- Updating contacts\n- Managing contact information\n\n5. Search in Tavily\nUse this for:\n- Internet searches\n- Current information\n- Recent news\n- Information that may have changed\n- Websites and online research\n\nTOOL SELECTION RULES:\n\nAlways choose the specialist tool that best matches the user's request.\n\nDo not use a specialist tool when it is unnecessary.\n\nIf the request requires multiple tools, use the tools in the appropriate\norder.\n\nExamples:\n\nUser: \"What's on my calendar tomorrow?\"\n→ calendar_agent\n\nUser: \"Schedule a meeting tomorrow at 3 PM.\"\n→ calendar_agent\n\nUser: \"Find emails from Rahul.\"\n→ email_agent\n\nUser: \"Reply to Rahul saying I'll call him tonight.\"\n→ email_agent\n\nUser: \"Write a LinkedIn post about my AI project.\"\n→ content_creator\n\nUser: \"What's Rahul's phone number?\"\n→ contact_agent\n\nUser: \"Save Rahul's number as 9876543210.\"\n→ contact_agent\n\nUser: \"What's the latest AI news?\"\n→ Search in Tavily\n\nMULTI-TOOL TASKS:\n\nIf the user asks for something requiring multiple specialist tools,\ncomplete the required steps in the correct order.\n\nFor example:\n\n\"Schedule a meeting with Rahul tomorrow at 3 PM and email him the details.\"\n\n→ First use calendar_agent to create the meeting.\n→ Then use email_agent to send the details.\n\nDo not claim an action was completed unless the corresponding tool\nsuccessfully completed it.\n\nIf a tool returns an error, explain the problem clearly.\n\nBe concise, natural, and helpful.\n\nYou are the user's central Jarvis-style assistant."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -16,
+        16
+      ],
+      "id": "9254ebc0-e4a8-45cd-832f-2f71976bf126",
+      "name": "YASH_ai"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        352,
+        16
+      ],
+      "id": "bf6f6c05-437c-47f9-a7fa-345764ac25fa",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool whenever the user wants to check, create, update, reschedule, or delete Google Calendar events. Use it for questions about the user's schedule, meetings, appointments, availability, or calendar events.",
+        "workflowId": {
+          "__rl": true,
+          "value": "q2kewlkfR7neXtLD",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/q2kewlkfR7neXtLD",
+          "cachedResultName": "calendar agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatInput": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('chatInput', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "chatInput"
+          ],
+          "schema": [
+            {
+              "id": "chatInput",
+              "displayName": "chatInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -80,
+        288
+      ],
+      "id": "18e7a706-d375-4a65-b3aa-7accae5035bf",
+      "name": "calendar agent"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool whenever the user wants to read, search, summarize, send, reply to, or manage emails in Gmail.",
+        "workflowId": {
+          "__rl": true,
+          "value": "VYGIZNtBrHtXKZ9z",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/VYGIZNtBrHtXKZ9z",
+          "cachedResultName": "email agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatInput": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('chatInput', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "chatInput"
+          ],
+          "schema": [
+            {
+              "id": "chatInput",
+              "displayName": "chatInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        288
+      ],
+      "id": "ccf02a1a-0dbb-45ce-99c2-8d2e9f53ec80",
+      "name": "Call 'email agent'"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool whenever the user wants to create, write, rewrite, improve, summarize, or generate content such as emails, LinkedIn posts, Instagram captions, scripts, articles, messages, or other written content.",
+        "workflowId": {
+          "__rl": true,
+          "value": "QkVzM7iyIHF1scTZ",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/QkVzM7iyIHF1scTZ",
+          "cachedResultName": "content_creation"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatInput": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('chatInput', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "chatInput"
+          ],
+          "schema": [
+            {
+              "id": "chatInput",
+              "displayName": "chatInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        144,
+        288
+      ],
+      "id": "5b183ab5-0ddb-428d-ac72-f71f075be804",
+      "name": "Call 'content_creation'"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool whenever the user wants to find, search, retrieve, create, update, or manage contacts and contact information.",
+        "workflowId": {
+          "__rl": true,
+          "value": "9e6NA6oHWW532CW9",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/9e6NA6oHWW532CW9",
+          "cachedResultName": "contact agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatInput": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('chatInput', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "chatInput"
+          ],
+          "schema": [
+            {
+              "id": "chatInput",
+              "displayName": "chatInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        256,
+        288
+      ],
+      "id": "17f3bb88-ad9d-4212-b453-0f0ce6ad8494",
+      "name": "Call 'contact agent'"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Search the internet for current information. Use this tool when the user asks for web searches, recent news, current information, websites, facts that may have changed, or information that requires internet research.",
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', `The user's web search query. Use this tool when the user needs current, recent, factual, or internet-based information.`, 'string') }}",
+        "options": {}
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        384,
+        272
+      ],
+      "id": "53253735-6265-4d31-9e98-4a8095f14679",
+      "name": "Search in Tavily"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "YASH_ai",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "YASH_ai",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "YASH_ai",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YASH_ai": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "calendar agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "YASH_ai",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'email agent'": {
+      "ai_tool": [
+        [
+          {
+            "node": "YASH_ai",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'content_creation'": {
+      "ai_tool": [
+        [
+          {
+            "node": "YASH_ai",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'contact agent'": {
+      "ai_tool": [
+        [
+          {
+            "node": "YASH_ai",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search in Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "YASH_ai",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  }
+}

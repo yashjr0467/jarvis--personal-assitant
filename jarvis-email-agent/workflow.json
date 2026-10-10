@@ -1,0 +1,175 @@
+{
+  "name": "email agent",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chatInput"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -192,
+        -48
+      ],
+      "id": "5c4d11de-ab21-42f2-abc1-e13d28434628",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "You are Jarvis's Email Agent.\n\nYour ONLY responsibility is managing the user's email.\n\nYou can:\n- Search emails\n- Read emails\n- Get recent emails\n- Summarize emails\n- Send emails\n- Reply to emails\n- Forward emails when requested\n- Help the user understand their inbox\n\nAlways understand the user's request before performing an action.\n\nFor sending an email, identify:\n- Recipient\n- Subject\n- Message/body\n\nNever invent an email address.\n\nIf the recipient or important email information is missing, ask the user for it.\n\nWhen searching for emails, use the Gmail tool rather than guessing.\n\nWhen the user asks to summarize emails, retrieve the relevant emails first and then summarize them.\n\nBefore sending an email, make sure the recipient, subject, and message are clear.\n\nAfter successfully sending an email, provide a short confirmation.\n\nYou are a specialist agent called by the main Jarvis AI Agent.\n\nDo not manage calendars, contacts, web searches, or unrelated tasks."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        32,
+        -48
+      ],
+      "id": "fffca6f7-cfb7-4f9a-bbb1-12b244de39a6",
+      "name": "email agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -112,
+        160
+      ],
+      "id": "2b18c4b5-2173-4c74-9c2f-63cbbb92c436",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Send a message iSend an email using the user's Gmail account. Use this tool when the user explicitly asks Jarvis to send an email.n Gmail",
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        304
+      ],
+      "id": "0f96d88d-68d3-4742-85d9-78a2baf83421",
+      "name": "Send a message in Gmail"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Send a messageSearch and retrieve emails from the user's Gmail account. Use this tool when the user asks to find, read, check, or retrieve emails. in Gmail",
+        "operation": "getAll",
+        "filters": {
+          "labelIds": [],
+          "q": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Search', `Gmail search query based on what the user is asking for. Use Gmail search syntax when appropriate, for example sender, subject, keywords, or date filters.`, 'string') }}",
+          "readStatus": "both",
+          "receivedAfter": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Received_After', `The start date and time from which to retrieve emails. Determine this from the user's request. Leave empty when the user does not specify a time period.`, 'string') }}",
+          "receivedBefore": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Received_Before', `The end date and time until which to retrieve emails. Determine this from the user's request. Leave empty when the user does not specify a time period.`, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        208
+      ],
+      "id": "82a76753-3886-4cee-9f37-3607a0075434",
+      "name": "Get many messages in Gmail"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Reply to a mReply to an existing email from the user's Gmail account. Use this tool when the user asks Jarvis to reply to an email.essage in Gmail",
+        "operation": "reply",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', `The Gmail message ID of the email that the user wants to reply to. Use the message ID returned by the Gmail search/read tool.`, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', `The complete reply that should be sent to the email. Write only the message content that should appear in the reply.`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        208
+      ],
+      "id": "4ace2de8-782b-4268-a0d4-0aab7067210d",
+      "name": "Reply to a message in Gmail"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "email agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "email agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "email agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "email agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "email agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  }
+}
